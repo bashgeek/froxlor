@@ -435,6 +435,16 @@ class Admins extends ApiCommand implements ResourceEntity
 		$ln_optional = $id > 0;
 		$loginname = $this->getParam('loginname', $ln_optional, '');
 
+		// a reseller (no change_serversettings) may only fetch their own record. Reject the
+		// request if either identifier that was actually supplied does not match their own
+		// identity - a mismatched id paired with the caller's own loginname (or vice versa)
+		// used to pass this gate on the OR below, and the query afterwards is driven by id
+		// alone, which let a reseller read any other admin's full row by id
+		if ($this->isAdmin() && $this->getUserDetail('change_serversettings') != 1
+			&& (($id > 0 && $id != $this->getUserDetail('adminid')) || (!empty($loginname) && $loginname != $this->getUserDetail('loginname')))) {
+			throw new Exception("Not allowed to execute given command.", 403);
+		}
+
 		if ($this->isAdmin() && ($this->getUserDetail('change_serversettings') == 1 || ($this->getUserDetail('adminid') == $id || $this->getUserDetail('loginname') == $loginname))) {
 			$result_stmt = Database::prepare("
 				SELECT * FROM `" . TABLE_PANEL_ADMINS . "`
