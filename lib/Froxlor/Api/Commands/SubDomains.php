@@ -1177,6 +1177,15 @@ class SubDomains extends ApiCommand implements ResourceEntity
 		// get needed customer info to reduce the subdomain-usage-counter by one
 		$customer = $this->getCustomerData();
 
+		// SubDomains.get() also returns main domains (parentdomainid = 0) owned by the customer
+		// (needed to show e.g. domain details), but customers must never be able to delete their
+		// main domain through here - it's not theirs to delete, an admin/reseller assigned it and
+		// owns the domains_used quota it counts against; the UI already blocks this
+		// (customer_domains.php: domains_cantdeletemaindomain), enforce it here too
+		if (!$this->isAdmin() && $result['parentdomainid'] == '0') {
+			Response::standardError('domains_cantdeletemaindomain', '', true);
+		}
+
 		if (!$this->isAdmin() && $result['caneditdomain'] == 0) {
 			throw new Exception("You cannot edit this resource", 405);
 		}
