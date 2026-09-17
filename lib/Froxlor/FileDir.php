@@ -452,8 +452,9 @@ class FileDir
 			// and the prefix comparisons) agrees on the same string - a $fixed_homedir with
 			// e.g. a legacy double-slash would otherwise mismatch a normalized $filename and
 			// reject an entirely legitimate path
-			$fixed_homedir = self::makeCorrectDir($fixed_homedir);
-			$to_check = explode("/", substr($filename, strlen($fixed_homedir)), -1);
+			$fixed_homedir = rtrim(preg_replace('#/+#', '/', self::makeCorrectDir($fixed_homedir)), '/') . '/';
+			$filename_to_check = preg_replace('#/+#', '/', $filename);
+			$to_check = explode("/", substr($filename_to_check, strlen($fixed_homedir)), -1);
 			$check_dir = substr($fixed_homedir, 0, -1);
 			// Symlink check
 			foreach ($to_check as $sub_dir) {
@@ -467,13 +468,18 @@ class FileDir
 						// relative directory, prepend link_dir
 						$check_dir = $link_dir . '/' . $check_dir;
 					}
+					// resolve any '..'/'.' segments lexically before the prefix check - otherwise
+					// a relative symlink target like '../../other_customer' would still lexically
+					// start with $fixed_homedir (since it's joined onto $link_dir first) and slip
+					// past the check below; see makeCorrectDir() for the same fix
+					$check_dir = self::resolveDotSegments($check_dir);
 					if (substr($check_dir, 0, strlen($fixed_homedir)) != $fixed_homedir) {
 						throw new Exception("Found symlink pointing outside of customer home directory: " . substr($original_target, strlen($fixed_homedir)));
 					}
 				}
 			}
 			// check for the path to be within the given homedir
-			if (substr($filename, 0, strlen($fixed_homedir)) != $fixed_homedir) {
+			if (substr($filename_to_check, 0, strlen($fixed_homedir)) != $fixed_homedir) {
 				throw new Exception("Target path/file not within the required customer home directory");
 			}
 			// check whether file is symlink itself
