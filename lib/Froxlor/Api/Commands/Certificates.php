@@ -76,6 +76,13 @@ class Certificates extends ApiCommand implements ResourceEntity
 		]);
 		$domainid = $domain['id'];
 
+		// certificate and private key are managed fully automatically for Let's Encrypt
+		// enabled domains and must not be editable via the API either - mirrors the same
+		// check in ssl_editor.php (UI) and the read-side gate in get()/listing() below
+		if ($domain['letsencrypt'] == '1') {
+			Response::standardError('sslcertificateisletsencryptmanaged', '', true);
+		}
+
 		// parameters
 		$ssl_cert_file = $this->getParam('ssl_cert_file');
 		$ssl_key_file = $this->getParam('ssl_key_file');
@@ -241,6 +248,13 @@ class Certificates extends ApiCommand implements ResourceEntity
 			'id' => $id,
 			'domainname' => $domainname
 		]);
+
+		// certificate and private key are managed fully automatically for Let's Encrypt
+		// enabled domains and must not be editable via the API either - mirrors the same
+		// check in ssl_editor.php (UI) and the read-side gate in get()/listing() below
+		if ($domain['letsencrypt'] == '1') {
+			Response::standardError('sslcertificateisletsencryptmanaged', '', true);
+		}
 
 		// parameters
 		$ssl_cert_file = $this->getParam('ssl_cert_file');

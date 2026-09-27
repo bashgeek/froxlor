@@ -928,6 +928,7 @@ return [
 		'sslcertificateinvalidcertkeypair' => 'Der angegebene Key (Private-Key) gehört nicht zum angegebenen Zertifikat.',
 		'sslcertificateinvalidca' => 'Das angegebene CA-Zertifikat scheint nicht gültig zu sein.',
 		'sslcertificateinvalidchain' => 'Das angegebene CertificateChainFile scheint nicht gültig zu sein.',
+		'sslcertificateisletsencryptmanaged' => 'SSL-Zertifikate für Domains mit aktiviertem Let\'s Encrypt werden automatisch verwaltet und können nicht manuell bearbeitet werden.',
 		'givendirnotallowed' => 'Das angegebene Verzeichnis im Feld %s ist nicht erlaubt.',
 		'sslredirectonlypossiblewithsslipport' => 'Die Nutzung von Let\'s Encrypt ist nur möglich, wenn die Domain mindestens eine IP/Port - Kombination mit aktiviertem SSL zugewiesen hat.',
 		'fcgidstillenableddeadlock' => 'FCGID ist derzeit aktiviert.<br />Bitte deaktiviere es, um einen anderen Webserver als Apache2 auswählen zu können.',

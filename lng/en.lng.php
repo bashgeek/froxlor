@@ -1000,6 +1000,7 @@ return [
 		'sslcertificateinvalidcertkeypair' => 'The given private-key does not belong to the given certificate',
 		'sslcertificateinvalidca' => 'The given CA certificate data does not seem to be a valid certificate',
 		'sslcertificateinvalidchain' => 'The given certificate chain data does not seem to be a valid certificate',
+		'sslcertificateisletsencryptmanaged' => 'SSL certificates for Let\'s Encrypt enabled domains are managed automatically and cannot be edited manually.',
 		'givendirnotallowed' => 'The given directory in field %s is not allowed.',
 		'sslredirectonlypossiblewithsslipport' => 'Using Let\'s Encrypt is only possible when the domain has at least one ssl-enabled IP/port combination assigned.',
 		'fcgidstillenableddeadlock' => 'FCGID is currently active.<br />Please deactivate it before switching to another webserver than Apache2',
