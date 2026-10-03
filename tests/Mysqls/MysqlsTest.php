@@ -249,6 +249,45 @@ class MysqlsTest extends TestCase
 
 	/**
 	 *
+	 * @depends testCustomerMysqlsAdd
+	 */
+	public function testStoreSettingMysqlAccessHost()
+	{
+		// this settings test is here because it requires existing databases to correct their mysql users
+		$fielddata = [
+			'label' => 'serversettings.mysql_access_host',
+			'settinggroup' => 'system',
+			'varname' => 'mysql_access_host'
+		];
+		$mysql_access_hosts = Settings::Get('system.mysql_access_host');
+
+		// add a new host, existing hosts must be kept
+		Store::storeSettingMysqlAccessHost('system_system_mysql_access_host', $fielddata, $mysql_access_hosts . ',10.0.0.11');
+		$hosts = $this->getMysqlUserHosts('test1sql1');
+		$this->assertContains('10.0.0.11', $hosts);
+		$this->assertContains('localhost', $hosts);
+
+		// remove it again
+		Store::storeSettingMysqlAccessHost('system_system_mysql_access_host', $fielddata, $mysql_access_hosts);
+		$hosts = $this->getMysqlUserHosts('test1sql1');
+		$this->assertNotContains('10.0.0.11', $hosts);
+		$this->assertContains('localhost', $hosts);
+	}
+
+	private function getMysqlUserHosts(string $username): array
+	{
+		Database::needRoot(true);
+		$sel_stmt = Database::prepare("SELECT `Host` FROM mysql.user WHERE `User` = :usr");
+		Database::pexecute($sel_stmt, [
+			'usr' => $username
+		]);
+		$hosts = $sel_stmt->fetchAll(\PDO::FETCH_COLUMN);
+		Database::needRoot(false);
+		return $hosts;
+	}
+
+	/**
+	 *
 	 * @depends testCustomerMysqlsList
 	 */
 	public function testCustomerMysqlsDelete()
